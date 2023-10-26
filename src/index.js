@@ -1,14 +1,16 @@
-import { Categoria } from "./Categoria.js";
+import { Categoria } from "./Clases.js";
+import { Frase } from "./Clases.js";
 
 document.addEventListener("DOMContentLoaded", function() {
-    const categoryTable = document.getElementById("category-table");
+    const tablaCategorias = document.getElementById("tablaCategorias");
 
-    categoryTable.addEventListener("click", function(event) {
+    tablaCategorias.addEventListener("click", function(event) {
+      //Este if comprueba que se pulsa un elemento <a></a> en HTML.
         if (event.target.tagName === "A") {
           
-            const categoryName = event.target.textContent;            
-            const category = new Categoria(categoryName);            
-            localStorage.setItem("categoria", JSON.stringify(category));            
+            const nombreCategoria = event.target.textContent;            
+            const categoriaObjetc = new Categoria(nombreCategoria);            
+            localStorage.setItem("categoria", JSON.stringify(categoriaObjetc));            
             window.location.href = `frases.html`;            
         }
     });
@@ -18,16 +20,36 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(response => response.json())
         .then(data => {
             
-            data.forEach(category => {
-                const row = categoryTable.insertRow();
+            data.forEach(categoria => {
+                const row = tablaCategorias.insertRow();
                 const cell = row.insertCell(0);                
-                const categoryLink = document.createElement("a");
-                categoryLink.href = "#"; 
-                categoryLink.textContent = category;
-                cell.appendChild(categoryLink);
+                const linkCategoria = document.createElement("a");
+                linkCategoria.href = "#"; 
+                linkCategoria.textContent = categoria;
+                cell.appendChild(linkCategoria);
             });
         })
         .catch(error => {
             console.error("Error al obtener categorías: " + error);
         });
 });
+
+
+const botonGenerarFrase = document.getElementById("generarFrase");
+const fraseAleatoriaDiv = document.getElementById("fraseAleatoriaDiv");
+
+
+botonGenerarFrase.addEventListener("click", () => {
+  
+  fetch("https://api.chucknorris.io/jokes/random")
+    .then((response) => response.json())
+    .then((data) => {
+      const fraseObject = new Frase("",data.value)
+      localStorage.setItem("fraseAleatoria", JSON.stringify(fraseObject)) 
+      fraseAleatoriaDiv.innerHTML = fraseObject.frase;
+    })
+    .catch((error) => {
+      console.error("Error al obtener la frase:", error);
+    });
+});
+
